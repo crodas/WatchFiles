@@ -11,5 +11,8 @@
             "email": "crodas@php.net"
         }
     ],
+    "autoload": {
+        "psr-0": {"WatchFiles": "lib/"}
+    }
     "minimum-stability": "dev"
 }
