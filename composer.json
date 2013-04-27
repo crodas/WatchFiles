@@ -13,6 +13,6 @@
     ],
     "autoload": {
         "psr-0": {"WatchFiles": "lib/"}
-    }
+    },
     "minimum-stability": "dev"
 }
