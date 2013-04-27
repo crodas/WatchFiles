@@ -1,7 +1,7 @@
 WatchFiles
 ==========
 
-Stateless way of watching files and directory for changes
+Stateless way of watching files and directory for changes.
 
 It is useful when you compile files, and you would like a simple and efficient way of watching files and directories for changes to avoid re-compilation.
 
