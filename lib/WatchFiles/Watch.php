@@ -47,6 +47,8 @@ class Watch
     protected $ns;
     protected $file;
 
+    protected static $namespaces = array();
+
     // getRelativePath {{{
     public static function getRelativePath($dir1, $dir2=NULL)
     {
@@ -99,9 +101,43 @@ class Watch
             }
         }
         $this->file = realpath($file);
-        $this->ns   = 'WatchFiles\\Generated\\Label_' . sha1($this->file);
+
+        if (!empty(self::$namespaces[$this->file])) {
+            $this->ns = self::$namespaces[$this->file];
+        } else {
+            $this->ns = 'WatchFiles\\Generated\\Label_' . sha1($this->file);
+        }
         $this->fnc  = $this->ns . '\\has_changed';
 
+    }
+
+    /**
+     *  Based on the glob pattern return a list 
+     *  of paths to watch in order to detect changes.
+     *  
+     *  For instance if we have `foo/some*dir/xxx` we must
+     *  watch `foo/` for changes.
+     *  
+     */
+    protected function getCommonParentDir($pattern, $dirs)
+    {
+        $comodin = array();
+        $parts   = array_filter(explode(DIRECTORY_SEPARATOR, $pattern));
+        foreach($parts as $i => $part) {
+            if (strpos($part, '*') !== false) {
+                $comodin[] = max($i-1, 0);
+            }
+        }
+
+        $tmpDirs = array(); 
+        foreach ($dirs as $dir) {
+            $parts = array_filter(explode(DIRECTORY_SEPARATOR, $dir));
+            foreach ($comodin as $i) {
+                $tmpDirs[] = DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, array_slice($parts, 0, $i));
+            }
+        }
+
+        return array_merge($dirs, array_unique($tmpDirs));
     }
 
     public function hasChanged()
@@ -126,25 +162,31 @@ class Watch
 
     public function watch()
     {
-        $files = array();
-        $dirs  = array();
-        $ns    = $this->ns;
-        $globs = $this->globs; 
+        $files  = array();
+        $dirs   = array();
+        $globs  = $this->globs; 
+        $zdirs  = $this->dirs;
+        $zfiles = $this->files;
+        $watching = $this->isWatching();
 
         foreach ($globs as $glob) {
+            $xdirs = array();
             foreach (glob($glob) as $file) {
                 if (is_dir($file)) {
-                    $this->dirs[] = $file;
+                    $xdirs[] = $file;
                 } else {
-                    $this->dirs[]  = dirname($file);
-                    $this->files[] = $file;
+                    $xdirs[]  = dirname($file);
+                    $zfiles[] = $file;
                 }
+            }
+            if (!empty($xdirs)) {
+                $zdirs = array_merge($zdirs, $this->getCommonParentDir($glob, $xdirs));
             }
         }
 
-
         foreach (array('files', 'dirs') as $type) {
-            foreach (array_unique($this->$type) as $file) {
+            $var = "z$type";
+            foreach (array_unique($$var) as $file) {
                 $rfile = self::getRelativePath($file, $this->file);
                 ${$type}[$rfile] = filemtime($file);
             }
@@ -156,17 +198,36 @@ class Watch
             'files' => $this->files,
         );
         
+        $ns = 'WatchFiles\\Generated\\Label_' . sha1($this->file);
         $code = Artifex::load(__DIR__ . '/Template.tpl.php')
             ->setContext(compact('dirs', 'files', 'ns', 'globs', 'input'))
             ->run();
 
         Artifex::save($this->file, $code);
+
+        if ($watching) {
+            $this->ns  = $ns = 'WatchFiles\\Runtime\\r' . uniqid(true);
+            $this->fnc = $this->ns . '\\has_changed';
+            static::$namespaces[ $this->file ] = $ns;
+            $prefix    = dirname($this->file);
+            $code = Artifex::load(__DIR__ . '/Template.tpl.php')
+                ->setContext(compact('dirs', 'files', 'ns', 'globs', 'input', 'prefix'))
+                ->run();
+            eval(substr($code,5));
+        }
+
         return $this;
     }
 
     public function watchGlob($glob)
     {
         $this->globs[] = $glob;
+        return $this;
+    }
+
+    public function watchGlobs(Array $globs)
+    {
+        $this->globs = array_merge($this->blogs, $globs);
         return $this;
     }
 
@@ -185,6 +246,17 @@ class Watch
         }
 
         return $watcher->watch();
+    }
+
+    function getFiles()
+    {
+        if (!$this->isWatching()) {
+            throw new \Exception("Cannot rebuild if you're not watching");
+        }
+        $function = $this->ns . '\\get_list';
+        $data     = $function();
+
+        return $data['files'];
     }
 
     public function isWatching()
@@ -206,27 +278,25 @@ class Watch
 
     public function watchFile($file)
     {
-        return $this->watchFiles(array($file));
+        $this->files[] = $file;
+        return $this;
     }
 
     public function watchDir($dir)
     {
-        return $this->watchDirs(array($dir));
+        $this->dirs[] = $dir;
+        return $this;
     }
 
     public function watchFiles(Array $files)
     {
-        foreach ($files as $file) {
-            $this->files[] = realpath($file);
-        }
+        $this->files = array_merge($this->files, $files);
         return $this;
     }
 
     public function watchDirs(Array $dirs)
     {
-        foreach ($dirs as $dir) {
-            $this->dirs[] = realpath($dir);
-        }
+        $this->dirs = array_merge($this->dirs, $dirs);
         return $this;
     }
 }
