@@ -42,6 +42,7 @@ class Watch
 {
     protected $files = array();
     protected $dirs  = array();
+    protected $globs = array();
     protected $fnc;
     protected $ns;
     protected $file;
@@ -97,9 +98,9 @@ class Watch
                 throw new \Exception("Cannot create file {$file}");
             }
         }
-        $this->file  = realpath($file);
-        $this->ns    = 'WatchFiles\\Generated\\Label_' . sha1($this->file);
-        $this->fnc   = $this->ns . '\\has_changed';
+        $this->file = realpath($file);
+        $this->ns   = 'WatchFiles\\Generated\\Label_' . sha1($this->file);
+        $this->fnc  = $this->ns . '\\has_changed';
 
     }
 
@@ -107,7 +108,14 @@ class Watch
     {
         if ($this->isWatching()) {
             $function = $this->fnc;
-            return $function();
+            $data = $this->ns . '\\get_watched_files';
+            $same = true;
+            foreach ($data() as $type => $value) {
+                $same &= count(array_diff($this->$type, $value)) == 0;
+            }
+            if ($same) {
+                return $function();
+            }
         }
 
         // no files are generated
@@ -121,6 +129,19 @@ class Watch
         $files = array();
         $dirs  = array();
         $ns    = $this->ns;
+        $globs = $this->globs; 
+
+        foreach ($globs as $glob) {
+            foreach (glob($glob) as $file) {
+                if (is_dir($file)) {
+                    $this->dirs[] = $file;
+                } else {
+                    $this->dirs[]  = dirname($file);
+                    $this->files[] = $file;
+                }
+            }
+        }
+
 
         foreach (array('files', 'dirs') as $type) {
             foreach (array_unique($this->$type) as $file) {
@@ -129,11 +150,23 @@ class Watch
             }
         }
 
+        $input = array(
+            'globs' => $this->globs,
+            'dirs'  => $this->dirs,
+            'files' => $this->files,
+        );
+        
         $code = Artifex::load(__DIR__ . '/Template.tpl.php')
-            ->setContext(compact('dirs', 'files', 'ns'))
+            ->setContext(compact('dirs', 'files', 'ns', 'globs', 'input'))
             ->run();
 
         Artifex::save($this->file, $code);
+        return $this;
+    }
+
+    public function watchGlob($glob)
+    {
+        $this->globs[] = $glob;
         return $this;
     }
 
@@ -150,10 +183,8 @@ class Watch
             $method = 'watch' . $type;
             $watcher->$method( $list );
         }
+
         return $watcher->watch();
-
-
-        return $this;
     }
 
     public function isWatching()
@@ -186,9 +217,6 @@ class Watch
     public function watchFiles(Array $files)
     {
         foreach ($files as $file) {
-            if (!is_file($file)) {
-                throw new \RuntimeException("{$file} is not a file");
-            }
             $this->files[] = realpath($file);
         }
         return $this;
@@ -197,9 +225,6 @@ class Watch
     public function watchDirs(Array $dirs)
     {
         foreach ($dirs as $dir) {
-            if (!is_dir($dir)) {
-                throw new \RuntimeException("{$dir} is not a directory");
-            }
             $this->dirs[] = realpath($dir);
         }
         return $this;

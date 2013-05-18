@@ -8,13 +8,22 @@ function get_list() {
             #* foreach ($files as $file => $ttl)
             __DIR__ . __@file__,
             #* end
-        )
-        , 'dirs' => array(
-             #* foreach ($dirs as $dir => $ttl)
+        ),
+        'dirs' => array(
+            #* foreach ($dirs as $dir => $ttl)
             __DIR__ . __@dir__,
+            #* end
+        ),
+        'glob' => array(
+            #* foreach ($globs as $glob)
+             __@glob__,
             #* end
         )
     );
+}
+
+function get_watched_files() {
+    return __@input__;
 }
 
 function has_changed()

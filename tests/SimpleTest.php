@@ -15,13 +15,22 @@ class SimpleTest extends \phpunit_framework_testcase
         $this->assertNotEquals($watch->hasChanged(), false);
     }
 
+    public function testFileRubbishInpt()
+    {
+        $watch = new Watch(TMP . '/test-file.php');
+        $watch->watchFile(__DIR__ . '/features/somefolder/xxx.txt');
+        $watch->watch();
+        $this->assertTrue($watch->hasChanged());
+    }
+
     public function testDir()
     {
         $watch = new Watch(TMP . '/test-dir.php');
-        $watch->watchDir(__DIR__ . '/features');
+        $watch->watchGlob(__DIR__ . '/featur*');
         $watch->watch();
         $this->assertFalse($watch->hasChanged());
         touch(__DIR__ . '/features/' . uniqid(true) . '.txt', time());
+        sleep(1);
         clearstatcache();
         $this->assertNotEquals($watch->hasChanged(), false);
     }
