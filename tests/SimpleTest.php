@@ -19,7 +19,6 @@ class SimpleTest extends \phpunit_framework_testcase
     {
         $watch = new Watch(TMP . '/test-file.php');
         $watch->watchFile(__DIR__ . '/features/somefolder/xxx.txt');
-        $watch->watch();
         $this->assertTrue($watch->hasChanged());
     }
 
