@@ -5,14 +5,22 @@ namespace __ns__;
 function get_list() {
     return array(
         'files' => array(
-            #* foreach ($files as $file => $ttl)
-            __DIR__ . __@file__,
+        #* foreach ($files as $path => $ttl)
+            #* if (!empty($prefix)) 
+            __@prefix__ . __@path__,
+            #* else
+            __DIR__ . __@path__,
             #* end
+        #* end
         ),
         'dirs' => array(
-            #* foreach ($dirs as $dir => $ttl)
-            __DIR__ . __@dir__,
+        #* foreach ($dirs as $path => $ttl)
+            #* if (!empty($prefix)) 
+            __@prefix__ . __@path__,
+            #* else
+            __DIR__ . __@path__,
             #* end
+        #* end
         ),
         'glob' => array(
             #* foreach ($globs as $glob)
@@ -28,15 +36,23 @@ function get_watched_files() {
 
 function has_changed()
 {
-    #* foreach ($dirs as $dir => $ts)
-    if (!is_dir(__DIR__ . __@dir__) || filemtime(__DIR__ . __@dir__) > __@ts__) {
-        return __DIR__ .  __@dir__;
+    #* foreach ($dirs as $path => $ts)
+    if (!is_dir(__DIR__ . __@path__) || filemtime(__DIR__ . __@path__) > __@ts__) {
+        #* if (!empty($prefix)) 
+        return __@prefix__ . __@path__;
+        #* else
+        return __DIR__ . __@path__;
+        #* end
     }
     #* end
 
-    #* foreach ($files as $file => $ts)
-    if (!is_file(__DIR__ . __@file__) || filemtime(__DIR__ . __@file__) > __@ts__) {
-        return __DIR__ .  __@file__;
+    #* foreach ($files as $path => $ts)
+    if (!is_file(__DIR__ . __@path__) || filemtime(__DIR__ . __@path__) > __@ts__) {
+        #* if (!empty($prefix)) 
+        return __@prefix__ . __@path__;
+        #* else
+        return __DIR__ . __@path__;
+        #* end
     }
     #* end
 
