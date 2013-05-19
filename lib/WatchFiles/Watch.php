@@ -147,7 +147,7 @@ class Watch
             $data = $this->ns . '\\get_watched_files';
             $same = true;
             foreach ($data() as $type => $value) {
-                $same &= count(array_diff($value, $this->$type)) == 0;
+                $same &= count(array_diff($this->$type, $value)) == 0;
             }
             if ($same) {
                 return $function();
