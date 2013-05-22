@@ -213,6 +213,7 @@ class Watch
             $code = Artifex::load(__DIR__ . '/Template.tpl.php')
                 ->setContext(compact('dirs', 'files', 'ns', 'globs', 'input', 'prefix'))
                 ->run();
+
             eval(substr($code,5));
         }
 

@@ -36,23 +36,19 @@ function get_watched_files() {
 
 function has_changed()
 {
+    #* if (!empty($prefix)) 
+    # $DIR = @$prefix
+    #end
+
     #* foreach ($dirs as $path => $ts)
     if (!is_dir(__DIR__ . __@path__) || filemtime(__DIR__ . __@path__) > __@ts__) {
-        #* if (!empty($prefix)) 
-        return __@prefix__ . __@path__;
-        #* else
         return __DIR__ . __@path__;
-        #* end
     }
     #* end
 
     #* foreach ($files as $path => $ts)
     if (!is_file(__DIR__ . __@path__) || filemtime(__DIR__ . __@path__) > __@ts__) {
-        #* if (!empty($prefix)) 
-        return __@prefix__ . __@path__;
-        #* else
         return __DIR__ . __@path__;
-        #* end
     }
     #* end
 
