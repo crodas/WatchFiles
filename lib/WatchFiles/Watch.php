@@ -37,6 +37,7 @@
 namespace WatchFiles;
 
 use Artifex;
+use crodas\Path;
 
 class Watch
 {
@@ -48,60 +49,6 @@ class Watch
     protected $file;
 
     protected static $namespaces = array();
-
-    // getRelativePath {{{
-    public static function getRelativePath($dir1, $dir2=NULL)
-    {
-        if (empty($dir2)) {
-            $dir2 = getcwd();
-        }
-
-        $slash = DIRECTORY_SEPARATOR;
-
-        $file = basename($dir1);
-        $dir1 = trim(realpath(dirname($dir1)), $slash);
-        $dir2 = trim(realpath(dirname($dir2)), $slash);
-        $to   = explode($slash, $dir1);
-        $from = explode($slash, $dir2);
-
-        if ($slash == '\\') {
-            // F*cking windows ;-)
-            if (strncasecmp($dir1, $dir2, 2) != 0) {
-                // There is no relative path
-                return $dir1;
-            }
-            $dir1 = substr($dir1, 2);
-            $dir2 = substr($dir2, 2);
-        }
-
-        $realPath = $to;
-
-        foreach ($from as $depth => $dir) {
-            if(isset($to[$depth]) && $dir === $to[$depth]) {
-                array_shift($realPath);
-            } else {
-                $remaining = count($from) - $depth;
-                if($remaining) {
-                    // add traversals up to first matching dir
-                    $padLength = (count($realPath) + $remaining) * -1;
-                    $realPath  = array_pad($realPath, $padLength, '..');
-                    break;
-                }
-            }
-        }
-
-        $rpath = implode($slash, $realPath);
-        if ($rpath && $rpath[0] != $slash) {
-            $rpath = $slash . $rpath;
-        }
-        
-        if ($file) {
-            $rpath .= $slash . $file;
-        }
-
-        return $rpath;
-    }
-    // }}}
 
     public function __construct($file)
     {
@@ -143,7 +90,11 @@ class Watch
         foreach ($dirs as $dir) {
             $parts = array_filter(explode(DIRECTORY_SEPARATOR, $dir));
             foreach ($comodin as $i) {
-                $tmpDirs[] = DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, array_slice($parts, 0, $i));
+                if (DIRECTORY_SEPARATOR == '\\') {
+                    $tmpDirs[] = implode(DIRECTORY_SEPARATOR, array_slice($parts, 0, $i));
+                } else {
+                    $tmpDirs[] = DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, array_slice($parts, 0, $i));
+                }
             }
         }
 
@@ -197,7 +148,7 @@ class Watch
         foreach (array('files', 'dirs') as $type) {
             $var = "z$type";
             foreach (array_unique($$var) as $file) {
-                $rfile = self::getRelativePath($file, $this->file);
+                $rfile = Path::getRelative($file, $this->file);
                 ${$type}[$rfile] = filemtime($file);
             }
         }
