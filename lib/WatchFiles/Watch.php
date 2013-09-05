@@ -176,6 +176,8 @@ class Watch
                 ->run();
 
             eval(substr($code,5));
+        } else {
+            require $this->file;
         }
 
         return $this;
