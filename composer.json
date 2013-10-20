@@ -2,11 +2,10 @@
     "name": "crodas/watch-files",
     "description": "Watch files and directories for changes",
     "require": {
-        "crodas/artifex": "*",
         "crodas/path": "*"
     },
     "license": "BSD-4-Clause",
-    "version": "v0.1.1",
+    "version": "v0.1.2",
     "authors": [
         {
             "name": "César D. Rodas",

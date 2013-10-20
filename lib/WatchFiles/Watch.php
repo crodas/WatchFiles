@@ -36,8 +36,8 @@
 */
 namespace WatchFiles;
 
-use Artifex;
 use crodas\Path;
+use crodas\File;
 
 class Watch
 {
@@ -159,23 +159,22 @@ class Watch
             'files' => $this->files,
         );
         
-        $ns = 'WatchFiles\\Generated\\Label_' . sha1($this->file);
-        $code = Artifex::load(__DIR__ . '/Template.tpl.php')
-            ->setContext(compact('dirs', 'files', 'ns', 'globs', 'input'))
-            ->run();
+        $ns   = 'WatchFiles\\Generated\\Label_' . sha1($this->file);
+        $tpl  = Templates::get('template');
+        $code = $tpl->render(compact('dirs', 'files', 'ns', 'globs', 'input'), true);
 
-        Artifex::save($this->file, $code);
+        File::write($this->file, $code);
 
         if ($watching) {
             $this->ns  = $ns = 'WatchFiles\\Runtime\\r' . uniqid(true);
             $this->fnc = $this->ns . '\\has_changed';
             static::$namespaces[ $this->file ] = $ns;
-            $prefix    = dirname($this->file);
-            $code = Artifex::load(__DIR__ . '/Template.tpl.php')
-                ->setContext(compact('dirs', 'files', 'ns', 'globs', 'input', 'prefix'))
-                ->run();
+            $prefix = dirname($this->file);
+            $code   = $tpl->render(compact('dirs', 'files', 'ns', 'globs', 'input', 'prefix'), true);
 
             eval(substr($code,5));
+        } else {
+            require $this->file;
         }
 
         return $this;
