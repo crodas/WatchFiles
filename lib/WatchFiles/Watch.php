@@ -232,6 +232,7 @@ class Watch
             if (is_callable($function)) {
                 return true;
             }
+            unlink($this->file);
         }
 
         return false;
