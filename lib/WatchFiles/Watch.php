@@ -182,6 +182,12 @@ class Watch
 
     public function watchGlob($glob)
     {
+        if (is_array($glob)) {
+            foreach ($glob as $g) {
+                $this->watchGlob($g);
+            }
+            return $this;
+        }
         $this->globs[] = $glob;
         return $this;
     }
