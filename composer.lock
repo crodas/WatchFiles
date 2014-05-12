@@ -3,20 +3,20 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "7019c66023a912685064d26c270f47f8",
+    "hash": "486bb95d9af00ef4a8ac60e564ef8118",
     "packages": [
         {
-            "name": "crodas/path",
-            "version": "dev-master",
+            "name": "crodas/file-util",
+            "version": "v0.1.7",
             "source": {
                 "type": "git",
-                "url": "https://github.com/crodas/Path.git",
-                "reference": "dd30f039e0647b52b4e3b16a02930c0dfd469554"
+                "url": "https://github.com/crodas/FileUtils.git",
+                "reference": "7252d879e1cb8d9752d2715badf8f6a76c3e240a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/crodas/Path/zipball/dd30f039e0647b52b4e3b16a02930c0dfd469554",
-                "reference": "dd30f039e0647b52b4e3b16a02930c0dfd469554",
+                "url": "https://api.github.com/repos/crodas/FileUtils/zipball/7252d879e1cb8d9752d2715badf8f6a76c3e240a",
+                "reference": "7252d879e1cb8d9752d2715badf8f6a76c3e240a",
                 "shasum": ""
             },
             "type": "library",
@@ -35,8 +35,8 @@
                     "email": "crodas@php.net"
                 }
             ],
-            "description": "Library to manipulate paths",
-            "time": "2013-09-24 07:12:15"
+            "description": "Useful libraries to manipulate files",
+            "time": "2014-05-12 05:54:40"
         }
     ],
     "packages-dev": [
@@ -45,7 +45,7 @@
     "aliases": [
 
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "stability-flags": [
 
     ],

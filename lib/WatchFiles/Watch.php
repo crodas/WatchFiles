@@ -36,8 +36,8 @@
 */
 namespace WatchFiles;
 
-use crodas\Path;
-use crodas\File;
+use crodas\FileUtil\Path;
+use crodas\FileUtil\File;
 
 class Watch
 {
