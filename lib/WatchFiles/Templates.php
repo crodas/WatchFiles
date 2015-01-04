@@ -7,6 +7,10 @@
 
 namespace {
 
+
+    $GLOBALS['file_54a990653d006'] = array();
+    $GLOBALS['line_54a990653d006'] = array();
+
     class base_template_cae776d793caf672c15e1210f1d0eb6609155ade
     {
         protected $parent;
@@ -61,78 +65,175 @@ namespace {
     class class_a4423e79cd6df51ca66b13affa3d681f3041bae4 extends base_template_cae776d793caf672c15e1210f1d0eb6609155ade
     {
 
+        public function hasSection($name)
+        {
+
+            return false;
+        }
+
+
+        public function renderSection($name, Array $args = array(), $fail_on_missing = true)
+        {
+            if (!$this->hasSection($name)) {
+                if ($fail_on_missing) {
+                    throw new \RuntimeException("Cannot find section {$name}");
+                }
+                return "";
+            }
+
+        }
+
         public function render(Array $vars = array(), $return = false)
         {
+            try {
+                return $this->_render($vars, $return);
+            } catch (\Exception $e) {
+                if ($return) ob_get_clean();
+                throw new WatchFiles\ExceptionWrapper($e, __FILE__);
+            }
+        }
+
+        public function _render(Array $vars = array(), $return = false)
+        {
+            global $file_54a990653d006, $line_54a990653d006;
             $this->context = $vars;
 
             extract($vars);
             if ($return) {
                 ob_start();
             }
-            echo "<?php\n\nnamespace " . ($ns) . ";\n\nfunction get_list() {\n    return array(\n        'files' => array(\n";
+            $_54a990653d006 = array_push($file_54a990653d006, 'Template.tpl.php') - 1;
+            $line_54a990653d006[$_54a990653d006] = 1;
+
+            echo "<?php\n\n";
+            $line_54a990653d006[$_54a990653d006] = 3;
+            $ns = "Watcher\\r" . uniqid(true);
+            $this->context['ns'] = $ns;
+            $line_54a990653d006[$_54a990653d006] = 4;
+            echo "\nnamespace ";
+            $line_54a990653d006[$_54a990653d006] = 5;
+            echo $ns . ";\n\nclass Watcher\n{\n\nfunction get_list() {\n    return array(\n        'files' => array(\n";
+            $line_54a990653d006[$_54a990653d006] = 13;
             foreach($files as $path => $ttl) {
+
+                $this->context['path'] = $path;
+                $this->context['ttl'] = $ttl;
+                $line_54a990653d006[$_54a990653d006] = 14;
                 if (!empty($prefix)) {
-                    echo "            \"";
-                    echo htmlentities($prefix, ENT_QUOTES, 'UTF-8', false);
-                    echo "\" . \"";
-                    echo htmlentities($path, ENT_QUOTES, 'UTF-8', false);
-                    echo "\",\n";
+                    $line_54a990653d006[$_54a990653d006] = 15;
+                    echo "            ";
+                    var_export($prefix);
+                    echo " . ";
+                    var_export($path);
+                    echo ",\n";
+                    $line_54a990653d006[$_54a990653d006] = 16;
                 }
                 else {
-                    echo "            __DIR__ . \"";
-                    echo htmlentities($path, ENT_QUOTES, 'UTF-8', false);
-                    echo "\",\n";
+                    $line_54a990653d006[$_54a990653d006] = 17;
+                    echo "            __DIR__ . ";
+                    var_export($path);
+                    echo ",\n";
+                    $line_54a990653d006[$_54a990653d006] = 18;
                 }
+                $line_54a990653d006[$_54a990653d006] = 19;
             }
+            $line_54a990653d006[$_54a990653d006] = 20;
             echo "        ),\n        'dirs' => array(\n";
+            $line_54a990653d006[$_54a990653d006] = 22;
             foreach($dirs as $path => $ttl) {
+
+                $this->context['path'] = $path;
+                $this->context['ttl'] = $ttl;
+                $line_54a990653d006[$_54a990653d006] = 23;
                 if (!empty($prefix)) {
-                    echo "            \"";
-                    echo htmlentities($prefix, ENT_QUOTES, 'UTF-8', false);
-                    echo "\" . \"";
-                    echo htmlentities($path, ENT_QUOTES, 'UTF-8', false);
-                    echo "\",\n";
+                    $line_54a990653d006[$_54a990653d006] = 24;
+                    echo "            ";
+                    var_export($prefix);
+                    echo " . ";
+                    var_export($path);
+                    echo ",\n";
+                    $line_54a990653d006[$_54a990653d006] = 25;
                 }
                 else {
-                    echo "            __DIR__ . \"";
-                    echo htmlentities($path, ENT_QUOTES, 'UTF-8', false);
-                    echo "\",\n";
+                    $line_54a990653d006[$_54a990653d006] = 26;
+                    echo "            __DIR__ . ";
+                    var_export($path);
+                    echo ",\n";
+                    $line_54a990653d006[$_54a990653d006] = 27;
                 }
+                $line_54a990653d006[$_54a990653d006] = 28;
             }
+            $line_54a990653d006[$_54a990653d006] = 29;
             echo "        ),\n        'glob' => array(\n";
+            $line_54a990653d006[$_54a990653d006] = 31;
             foreach($globs as $glob) {
-                echo "                \"";
-                echo htmlentities($glob, ENT_QUOTES, 'UTF-8', false);
-                echo "\",\n";
+
+                $this->context['glob'] = $glob;
+                $line_54a990653d006[$_54a990653d006] = 32;
+                echo "                ";
+                var_export($glob);
+                echo ",\n";
+                $line_54a990653d006[$_54a990653d006] = 33;
             }
-            echo "        )\n    );\n}\n\nfunction get_watched_files() {\n    return " . (var_export($input, true) ) . ";\n}\n\nfunction has_changed()\n{\n";
+            $line_54a990653d006[$_54a990653d006] = 34;
+            echo "        )\n    );\n}\n\nfunction get_watched_files() {\n    return ";
+            $line_54a990653d006[$_54a990653d006] = 39;
+            echo var_export($input, true) . ";\n}\n\nfunction has_changed()\n{\n";
+            $line_54a990653d006[$_54a990653d006] = 44;
             if (!empty($prefix)) {
+                $line_54a990653d006[$_54a990653d006] = 45;
                 $DIR = var_export($prefix, true);
+                $this->context['DIR'] = $DIR;
+                $line_54a990653d006[$_54a990653d006] = 46;
             }
             else {
+                $line_54a990653d006[$_54a990653d006] = 47;
                 $DIR = "__DIR__";
+                $this->context['DIR'] = $DIR;
+                $line_54a990653d006[$_54a990653d006] = 48;
             }
+            $line_54a990653d006[$_54a990653d006] = 49;
             echo "\n";
+            $line_54a990653d006[$_54a990653d006] = 50;
             foreach($dirs as $path => $ts) {
-                echo "    if (!is_dir(" . ($DIR) . " . \"";
-                echo htmlentities($path, ENT_QUOTES, 'UTF-8', false);
-                echo "\") || filemtime(" . ($DIR) . " . \"";
-                echo htmlentities($path, ENT_QUOTES, 'UTF-8', false);
-                echo "\") > " . ($ts) . ") {\n        return " . ($DIR) . " . \"";
-                echo htmlentities($path, ENT_QUOTES, 'UTF-8', false);
-                echo "\";\n    }\n";
+
+                $this->context['path'] = $path;
+                $this->context['ts'] = $ts;
+                $line_54a990653d006[$_54a990653d006] = 51;
+                echo "    if (!is_dir(" . ($DIR) . " . ";
+                var_export($path);
+                echo ") || filemtime(" . ($DIR) . " . ";
+                var_export($path);
+                echo ") > " . ($ts) . ") {\n        return ";
+                $line_54a990653d006[$_54a990653d006] = 52;
+                echo $DIR . " . ";
+                var_export($path);
+                echo ";\n    }\n";
+                $line_54a990653d006[$_54a990653d006] = 54;
             }
+            $line_54a990653d006[$_54a990653d006] = 55;
             echo "\n";
+            $line_54a990653d006[$_54a990653d006] = 56;
             foreach($files as $path => $ts) {
-                echo "    if (!is_file(" . ($DIR) . " . \"";
-                echo htmlentities($path, ENT_QUOTES, 'UTF-8', false);
-                echo "\") || filemtime(" . ($DIR) . " . \"";
-                echo htmlentities($path, ENT_QUOTES, 'UTF-8', false);
-                echo "\") > " . ($ts) . ") {\n        return " . ($DIR) . " . \"";
-                echo htmlentities($path, ENT_QUOTES, 'UTF-8', false);
-                echo "\";\n    }\n";
+
+                $this->context['path'] = $path;
+                $this->context['ts'] = $ts;
+                $line_54a990653d006[$_54a990653d006] = 57;
+                echo "    if (!is_file(" . ($DIR) . " . ";
+                var_export($path);
+                echo ") || filemtime(" . ($DIR) . " . ";
+                var_export($path);
+                echo ") > " . ($ts) . ") {\n        return ";
+                $line_54a990653d006[$_54a990653d006] = 58;
+                echo $DIR . " . ";
+                var_export($path);
+                echo ";\n    }\n";
+                $line_54a990653d006[$_54a990653d006] = 60;
             }
-            echo "\n    return false;\n}\n";
+            $line_54a990653d006[$_54a990653d006] = 61;
+            echo "\n    return false;\n}\n\n}\n\nreturn new Watcher;\n";
+
+            array_pop($file_54a990653d006);
 
             if ($return) {
                 return ob_get_clean();
@@ -145,8 +246,78 @@ namespace {
 
 namespace WatchFiles {
 
+    use Exception;
+
+    class ExceptionWrapper extends Exception
+    {
+        public $e;
+        protected $file;
+
+        public function getSimpleViewTrace()
+        {
+            global $file_54a990653d006, $line_54a990653d006;
+
+            $traces = $this->e->getTrace();
+            $i = 0;
+            foreach ($traces as &$trace) {
+                if (!empty($trace['file'])
+                    && $trace['file'] == $this->file && !empty($file_54a990653d006[$i])) {
+                    $trace['file'] = $file_54a990653d006[$i];
+                    $trace['line'] = $line_54a990653d006[$i];
+                    ++$i;
+                }
+                if (empty($trace['file'])) {
+                    $trace['file'] = '[internal function]';
+                }
+                if (empty($trace['line'])) {
+                    $trace['line'] = '';
+                }
+            }
+
+            return $traces;
+        }
+
+        public function __toString()
+        {
+            $traces = $this->getSimpleViewTrace();
+            $str    = "exception '" . get_class($this->e) . "' in {$traces[0]['file']}{$traces[0]['line']}:\nStack trace:\n";
+            foreach ($traces as $i => $trace) {
+                $str .= "#{$i} {$trace['file']}:{$trace['line']}\n";
+            }
+            ++$i;
+            $str .= "#{$i} {main}";
+            return $str;
+        }
+
+        public function __construct(Exception $e, $file)
+        {
+            $this->e    = $e;
+            $this->file = $file;
+        }
+    }
+
+
     class Templates
     {
+        public static function getAll()
+        {
+            return array (
+                0 => 'template',
+            );
+        }
+
+        public static function getAllSections($name, $fail = true)
+        {
+            switch ($name) {
+            default:
+                if ($fail) {
+                    throw new \RuntimeException("Cannot find section {$name}");
+                }
+
+                return array();
+            }
+        }
+
         public static function exec($name, Array $context = array(), Array $global = array())
         {
             $tpl = self::get($name);

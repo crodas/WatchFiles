@@ -38,15 +38,16 @@ namespace WatchFiles;
 
 use crodas\FileUtil\Path;
 use crodas\FileUtil\File;
+use RuntimeException;
 
 class Watch
 {
     protected $files = array();
     protected $dirs  = array();
     protected $globs = array();
-    protected $fnc;
-    protected $ns;
     protected $file;
+    protected $obj;
+    protected static $loaded = array();
 
     protected static $namespaces = array();
 
@@ -54,18 +55,21 @@ class Watch
     {
         if (!is_file($file)) {
             if (!touch($file)) {
-                throw new \Exception("Cannot create file {$file}");
+                throw new RuntimeException("Cannot create file {$file}");
             }
         }
-        $this->file = realpath($file);
 
-        if (!empty(self::$namespaces[$this->file])) {
-            $this->ns = self::$namespaces[$this->file];
-        } else {
-            $this->ns = 'WatchFiles\\Generated\\Label_' . sha1($this->file);
+        $this->file = $file;
+        $this->obj  = self::Load($file);
+    }
+    
+    protected static function Load($file)
+    {
+        if (empty(self::$loaded[$file])) {
+            self::$loaded[$file] = require $file;
         }
-        $this->fnc  = $this->ns . '\\has_changed';
 
+        return self::$loaded[$file];
     }
 
     /**
@@ -104,14 +108,12 @@ class Watch
     public function hasChanged()
     {
         if ($this->isWatching()) {
-            $function = $this->fnc;
-            $data = $this->ns . '\\get_watched_files';
             $same = true;
-            foreach ($data() as $type => $value) {
+            foreach ($this->obj->get_watched_files() as $type => $value) {
                 $same &= count(array_diff($this->$type, $value)) == 0;
             }
             if ($same) {
-                return $function();
+                return $this->obj->has_changed();
             }
         }
 
@@ -121,6 +123,17 @@ class Watch
         return true;
     }
 
+    protected function realPath(Array $files)
+    {
+        foreach ($files as $id => $file) {
+            if (file_exists($file)) {
+                $files[$id] = realpath($file);
+            }
+        }
+
+        return $files;
+    }
+
     public function watch()
     {
         $files  = array();
@@ -128,7 +141,6 @@ class Watch
         $globs  = $this->globs; 
         $zdirs  = $this->dirs;
         $zfiles = $this->files;
-        $watching = $this->isWatching();
 
         foreach ($globs as $glob) {
             $xdirs = array();
@@ -155,29 +167,16 @@ class Watch
 
         $input = array(
             'globs' => $this->globs,
-            'dirs'  => $this->dirs,
-            'files' => $this->files,
+            'dirs'  => $this->realPath($this->dirs),
+            'files' => $this->realPath($this->files),
         );
         
-        $ns   = 'WatchFiles\\Generated\\Label_' . sha1($this->file);
         $tpl  = Templates::get('template');
-        $code = $tpl->render(compact('dirs', 'files', 'ns', 'globs', 'input'), true);
+        $code = $tpl->render(compact('dirs', 'files', 'globs', 'input'), true);
 
         File::write($this->file, $code);
 
-        if ($watching) {
-            $this->ns  = $ns = 'WatchFiles\\Runtime\\r' . uniqid(true);
-            $this->fnc = $this->ns . '\\has_changed';
-            static::$namespaces[ $this->file ] = $ns;
-            $prefix = dirname($this->file);
-            $code   = $tpl->render(compact('dirs', 'files', 'ns', 'globs', 'input', 'prefix'), true);
-
-            eval(substr($code,5));
-        } else {
-            require $this->file;
-        }
-
-        return $this;
+        return self::$loaded[$this->file] = $this->obj = require $this->file;
     }
 
     public function watchGlob($glob)
@@ -194,54 +193,56 @@ class Watch
 
     public function watchGlobs(Array $globs)
     {
-        $this->globs = array_merge($this->blogs, $globs);
+        $this->globs = array_merge($this->globs, $globs);
         return $this;
     }
 
     public function rebuild()
     {
         if (!$this->isWatching()) {
-            throw new \Exception("Cannot rebuild if you're not watching");
+            throw new RuntimeException("Cannot rebuild if you're not watching");
         }
+        
+        unlink($this->file);
+        unset(self::$loaded[$this->file]);
 
-        $function = $this->ns . '\\get_list';
-        $watched  = $function();
+        $watched  = $this->obj->get_list();
         $watcher  = new self($this->file);
         foreach ($watched as $type => $list) {
             $method = 'watch' . $type;
             $watcher->$method( $list );
         }
 
-        return $watcher->watch();
+        $watcher->watch();
+        $this->obj = $watcher->obj;
+
+        return $this;
+    }
+
+    public function get($type = 'files')
+    {
+        if (!$this->isWatching()) {
+            throw new RuntimeException("Cannot rebuild if you're not watching");
+        }
+
+        $data = $this->obj->get_list();
+
+        return $data[$type];
+    }
+
+    public function getDirs()
+    {
+        return $this->get('dirs');
     }
 
     function getFiles()
     {
-        if (!$this->isWatching()) {
-            throw new \Exception("Cannot rebuild if you're not watching");
-        }
-        $function = $this->ns . '\\get_list';
-        $data     = $function();
-
-        return $data['files'];
+        return $this->get('files');
     }
 
     public function isWatching()
     {
-        $function = $this->fnc;
-        if (is_callable($function)) {
-            return true;
-        }
-
-        if (is_file($this->file)) {
-            require $this->file;
-            if (is_callable($function)) {
-                return true;
-            }
-            unlink($this->file);
-        }
-
-        return false;
+        return is_object($this->obj);
     }
 
     public function watchFile($file)
