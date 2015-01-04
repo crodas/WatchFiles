@@ -1,30 +1,35 @@
 <?php
 
+@set($ns, "Watcher\\r" . uniqid(true))
+
 namespace {{$ns}};
+
+class Watcher
+{
 
 function get_list() {
     return array(
         'files' => array(
         @foreach ($files as $path => $ttl)
             @if (!empty($prefix)) 
-            "{{{$prefix}}}" . "{{{$path}}}",
+            {{@$prefix}} . {{@$path}},
             @else
-            __DIR__ . "{{{$path}}}",
+            __DIR__ . {{@$path}},
             @end
         @end
         ),
         'dirs' => array(
         @foreach ($dirs as $path => $ttl)
             @if (!empty($prefix)) 
-            "{{{$prefix}}}" . "{{{$path}}}",
+            {{@$prefix}} . {{@$path}},
             @else
-            __DIR__ . "{{{$path}}}",
+            __DIR__ . {{@$path}},
             @end
         @end
         ),
         'glob' => array(
             @foreach ($globs as $glob)
-                "{{{$glob}}}",
+                {{@$glob}},
             @end
         )
     );
@@ -43,16 +48,20 @@ function has_changed()
     @end
 
     @foreach ($dirs as $path => $ts)
-    if (!is_dir({{$DIR}} . "{{{$path}}}") || filemtime({{$DIR}} . "{{{$path}}}") > {{$ts}}) {
-        return {{$DIR}} . "{{{$path}}}";
+    if (!is_dir({{$DIR}} . {{@$path}}) || filemtime({{$DIR}} . {{@$path}}) > {{$ts}}) {
+        return {{$DIR}} . {{@$path}};
     }
     @end
 
     @foreach ($files as $path => $ts)
-    if (!is_file({{$DIR}} . "{{{$path}}}") || filemtime({{$DIR}} . "{{{$path}}}") > {{$ts}}) {
-        return {{$DIR}} . "{{{$path}}}";
+    if (!is_file({{$DIR}} . {{@$path}}) || filemtime({{$DIR}} . {{@$path}}) > {{$ts}}) {
+        return {{$DIR}} . {{@$path}};
     }
     @end
 
     return false;
 }
+
+}
+
+return new Watcher;
