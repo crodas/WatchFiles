@@ -85,7 +85,8 @@ class SimpleTest extends \phpunit_framework_testcase
     {
         $watch = new Watch(TMP . '/test-file.php');
         $this->assertTrue(is_array($watch->getFiles()));
-        $this->assertFalse(empty($watch->getFiles()));
+        $return = $watch->getFiles();
+        $this->assertFalse(empty($return));
     }
 
     /**
