@@ -25,7 +25,7 @@ class SimpleTest extends \phpunit_framework_testcase
     public function testGlobsArray()
     {
         $watch = new Watch(TMP . '/test-array-arrayx.php');
-        $watch->watchGlobs([__DIR__ . '/featur*']);
+        $watch->watchGlobs(array(__DIR__ . '/featur*'));
         $watch->watch();
         $this->assertFalse($watch->hasChanged());
         touch(__DIR__ . '/features/' . uniqid(true) . '.txt', time());
@@ -38,7 +38,7 @@ class SimpleTest extends \phpunit_framework_testcase
     public function testGlobArray()
     {
         $watch = new Watch(TMP . '/test-array-array.php');
-        $watch->watchGlob([__DIR__ . '/featur*']);
+        $watch->watchGlob(array(__DIR__ . '/featur*'));
         $watch->watch();
         $this->assertFalse($watch->hasChanged());
         touch(__DIR__ . '/features/' . uniqid(true) . '.txt', time());
@@ -85,7 +85,8 @@ class SimpleTest extends \phpunit_framework_testcase
     {
         $watch = new Watch(TMP . '/test-file.php');
         $this->assertTrue(is_array($watch->getFiles()));
-        $this->assertFalse(empty($watch->getFiles()));
+        $return = $watch->getFiles();
+        $this->assertFalse(empty($return));
     }
 
     /**

@@ -2,11 +2,13 @@
     "name": "crodas/watch-files",
     "description": "Watch files and directories for changes",
     "require": {
-        "crodas/file-util": ">=0.1.7",
+        "crodas/file-util": ">=0.1.7"
+    },
+    "require-dev": {
         "crodas/simple-view-engine": "~0.1"
     },
     "license": "BSD-4-Clause",
-    "version": "v0.1.6",
+    "version": "v0.1.7",
     "authors": [
         {
             "name": "César D. Rodas",
