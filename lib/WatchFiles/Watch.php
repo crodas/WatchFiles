@@ -160,8 +160,7 @@ class Watch
         foreach (array('files', 'dirs') as $type) {
             $var = "z$type";
             foreach (array_unique($$var) as $file) {
-                $rfile = Path::getRelative($file, $this->file);
-                ${$type}[$rfile] = filemtime($file);
+                ${$type}[$file] = filemtime($file);
             }
         }
 
@@ -174,9 +173,9 @@ class Watch
         $tpl  = Templates::get('template');
         $code = $tpl->render(compact('dirs', 'files', 'globs', 'input'), true);
 
-        File::write($this->file, $code);
+        
 
-        return self::$loaded[$this->file] = $this->obj = require $this->file;
+        return self::$loaded[$this->file] = $this->obj = File::writeAndInclude($this->file, $code);
     }
 
     public function watchGlob($glob)

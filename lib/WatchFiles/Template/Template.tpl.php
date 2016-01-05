@@ -11,20 +11,12 @@ function get_list() {
     return array(
         'files' => array(
         @foreach ($files as $path => $ttl)
-            @if (!empty($prefix)) 
-            {{@$prefix}} . {{@$path}},
-            @else
-            __DIR__ . {{@$path}},
-            @end
+            {{@$path}},
         @end
         ),
         'dirs' => array(
         @foreach ($dirs as $path => $ttl)
-            @if (!empty($prefix)) 
-            {{@$prefix}} . {{@$path}},
-            @else
-            __DIR__ . {{@$path}},
-            @end
+            {{@$path}},
         @end
         ),
         'glob' => array(
@@ -41,21 +33,16 @@ function get_watched_files() {
 
 function has_changed()
 {
-    @if (!empty($prefix))
-        @set($DIR, var_export($prefix, true))
-    @else
-        @set($DIR, "__DIR__");
-    @end
 
     @foreach ($dirs as $path => $ts)
-    if (!is_dir({{$DIR}} . {{@$path}}) || filemtime({{$DIR}} . {{@$path}}) > {{$ts}}) {
-        return {{$DIR}} . {{@$path}};
+    if (!is_dir({{@$path}}) || filemtime({{@$path}}) > {{$ts}}) {
+        return {{@$path}};
     }
     @end
 
     @foreach ($files as $path => $ts)
-    if (!is_file({{$DIR}} . {{@$path}}) || filemtime({{$DIR}} . {{@$path}}) > {{$ts}}) {
-        return {{$DIR}} . {{@$path}};
+    if (!is_file({{@$path}}) || filemtime({{@$path}}) > {{$ts}}) {
+        return {{@$path}};
     }
     @end
 
