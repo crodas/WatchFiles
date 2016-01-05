@@ -2,7 +2,9 @@
     "name": "crodas/watch-files",
     "description": "Watch files and directories for changes",
     "require": {
-        "crodas/file-util": ">=0.1.7",
+        "crodas/file-util": ">=0.2"
+    },
+    "require-dev": {
         "crodas/simple-view-engine": "~0.1"
     },
     "license": "BSD-4-Clause",
