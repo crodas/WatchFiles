@@ -160,7 +160,7 @@ class Watch
         foreach (array('files', 'dirs') as $type) {
             $var = "z$type";
             foreach (array_unique($$var) as $file) {
-                ${$type}[$file] = filemtime($file);
+                ${$type}[$file] = is_readable($file) ? filemtime($file) : time();
             }
         }
 
