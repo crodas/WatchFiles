@@ -157,10 +157,12 @@ class Watch
             }
         }
 
+        $now = time();
         foreach (array('files', 'dirs') as $type) {
             $var = "z$type";
             foreach (array_unique($$var) as $file) {
-                ${$type}[$file] = filemtime($file);
+                ${$type}[$file] = is_readable($file) ? filemtime($file) : $now;
+                ${$type}[$file] = ${$type}[$file] ? ${$type}[$file] : $now;
             }
         }
 
